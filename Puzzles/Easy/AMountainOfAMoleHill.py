@@ -1,32 +1,64 @@
 import sys
 import math
 
-# Auto-generated code below aims at helping you parse
-# the standard input according to the problem statement.
+cpt = []
 
-cpt = 0
+
+def printMap(m):
+    for line in m:
+        print(line, file=sys.stderr)
+    print(file=sys.stderr)
+
+
+def floodFillUtil(m, x, y, count):
+    # Base cases
+    if (x < 0 or x > 15 or y < 0 or y > 15 or m[x][y] == 1):
+        return
+
+    if (count and m[x][y] == 2):
+        cpt.append(1)
+
+    m[x][y] = 1
+
+    floodFillUtil(m, x + 1, y, count)
+    floodFillUtil(m, x + 1, y + 1, count)
+    floodFillUtil(m, x, y + 1, count)
+    floodFillUtil(m, x - 1, y + 1, count)
+    floodFillUtil(m, x - 1, y, count)
+    floodFillUtil(m, x - 1, y - 1, count)
+    floodFillUtil(m, x, y - 1, count)
+    floodFillUtil(m, x + 1, y - 1, count)
+
+
 m = []
 for i in range(16):
+    r = []
     line = input()
     print(line, file=sys.stderr)
-    m.append(line)
+    for c in line:
+        if (c in ['|', '+', '-']):
+            r.append(1)
+        elif (c in [' ', '.']):
+            r.append(0)
+        else:
+            r.append(2)
+    m.append(r)
 
-for line in m:
-    garden = []
-    i = 0
-    while i < len(line):
-        if line[i] in ['|', '+']:
-            while i < len(line) and line[i] in ['|', '+']:
-                garden.append(i)
-                i += 1
-        i += 1
-    print(garden, file=sys.stderr)
+for i in range(16):
+    for j in range(16):
+        if m[i][j] == 1:
+            if j == 0:
+                if m[i][1] != 1:
+                    print(i, j, file=sys.stderr)
+                    floodFillUtil(m, i, 1, True)
+                    printMap(m)
+            elif j < 15:
+                if m[i][j+1] != 1 and m[i][j-1] != 1:
+                    print(i, j, file=sys.stderr)
+                    floodFillUtil(m, i, j+1, True)
+                    printMap(m)
+        elif m[i][j] == 2:
+            m[i][j] = 0
+    print(len(cpt), file=sys.stderr)
 
-    i = 0
-    while i < len(garden)-1:
-        if line.count('.', garden[i], garden[i+1]) == 0 and garden[i+1]-garden[i] > 1:
-            cpt += line.count('o', garden[i], garden[i+1])
-            print("Between", garden[i], garden[i+1], cpt, file=sys.stderr)
-        i += 1
-
-print(cpt)
+print(len(cpt))
